@@ -1,6 +1,7 @@
 const express=require('express')
 const blogController=require('../Controllers/blogController')
 const authorController=require('../Controllers/authorController')
+const auth=require('../Middleware/auth')
 const router=express.Router()
 
 router.get("/test",(req,res)=>{
