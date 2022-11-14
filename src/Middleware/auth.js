@@ -24,7 +24,7 @@ const authorization = function (req, res, next) {
         .status(400)
         .send({ status: false, msg: "AuthorId is required to do this action" });
     }
-    req.loggedIn = decodeToken;
+    req.loggedIn = decodeToken.authorId;
     next();
   } catch (err) {
     return res.status(500).send({ status: false, err: err.message });
@@ -33,6 +33,7 @@ const authorization = function (req, res, next) {
 
 const authentication = function (req, res, next) {
   try {
+    const authorId=req.params.authorId;
     if (req.loggedIn != authorId) {
       return res
         .status(400)
