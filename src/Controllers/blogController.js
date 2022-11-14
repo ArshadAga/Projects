@@ -21,18 +21,10 @@ const putBlog = async function (req, res) {
     let id = req.params.blogId;
 
     if (!id) {
-      return res
-        .status(400)
-        .send({
-          status: false,
-          msg: "blogId must be present in request param ",
-        });
-    }
-
-    if (!authorId.isValidObjectId(id)) {
-      return res
-        .status(400)
-        .send({ status: false, msg: "Please provide a Valid blogId" });
+      return res.status(400).send({
+        status: false,
+        msg: "blogId must be present in request param ",
+      });
     }
 
     let blogFound = await blogModel.findOne({ _id: id });
@@ -66,29 +58,19 @@ const deleteBlog = async function (req, res) {
     let authorId = req.query.authorId;
 
     if (!blog) {
-      return res
-        .status(400)
-        .send({
-          status: false,
-          msg: "blogId must be present in order to delete it",
-        });
-    }
-
-    if (!authorId.isValidObjectId(blog)) {
-      return res
-        .status(400)
-        .send({ status: false, msg: "Please provide a Valid blogId" });
+      return res.status(400).send({
+        status: false,
+        msg: "blogId must be present in order to delete it",
+      });
     }
 
     let blogFound = await blogModel.findOne({ _id: blog });
 
     if (!blogFound) {
-      return res
-        .status(400)
-        .send({
-          status: false,
-          msg: "No blog exists bearing this Blog Id, please provide another one",
-        });
+      return res.status(400).send({
+        status: false,
+        msg: "No blog exists bearing this Blog Id, please provide another one",
+      });
     }
 
     if (blogFound.isdeleted === true) {
@@ -104,13 +86,11 @@ const deleteBlog = async function (req, res) {
     );
 
     if (deletedBlog) {
-      return res
-        .status(200)
-        .send({
-          status: true,
-          msg: "Your Blog has been successfully deleted",
-          deletedData: deletedBlog,
-        });
+      return res.status(200).send({
+        status: true,
+        msg: "Your Blog has been successfully deleted",
+        deletedData: deletedBlog,
+      });
     }
   } catch (err) {
     res.status(500).send({ status: false, msg: err.message });

@@ -2,7 +2,8 @@ const jwt = require("jsonwebtoken");
 
 const authorization = function (req, res, next) {
   try {
-    let token = req.headers["x-auth-token"];
+   // let token = req.headers["x-auth-token"];
+   let token=req.token;
 
     if (!token) {
       return res
@@ -33,7 +34,7 @@ const authorization = function (req, res, next) {
 
 const authentication = function (req, res, next) {
   try {
-    const authorId=req.params.authorId;
+    const authorId = req.params.authorId;
     if (req.loggedIn != authorId) {
       return res
         .status(400)
