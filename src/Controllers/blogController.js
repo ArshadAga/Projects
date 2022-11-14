@@ -1,7 +1,53 @@
 const blogModel = require("../Models/blogModel");
+const authorModel = require("../Models/authorModel");
 
 const createBlog = async function (req, res) {
   try {
+    const data = req.body;
+
+    if (Object.keys(data).length == 0) {
+      return res
+        .status(400)
+        .send({ status: false, message: "All Keys are Mandatory" });
+    }
+
+    const { title, body, authorId, category } = data;
+
+    if (!isValid(title)) {
+      return res.status(400).send({ status: false, msg: "title is required" });
+    }
+
+    if (!isValid(body)) {
+      return res.status(400).send({ status: false, msg: "body is required" });
+    }
+
+    if (!isValid(authorId)) {
+      return res
+        .status(400)
+        .send({ status: false, msg: "authorId is required" });
+    }
+
+    if (!isValidObjectId(authorId)) {
+      return res
+        .status(400)
+        .send({ status: false, msg: `${authorId} is not a valid authorId` });
+    }
+
+    if (!isValid(category)) {
+      return res
+        .status(400)
+        .send({ status: false, msg: "category title is required" });
+    }
+
+    const author = await authorModel.findById(authorId);
+    if (!author) {
+      return res
+        .status(400)
+        .send({ status: false, msg: "author does not exist" });
+    }
+
+    const savedData = await blogModel.create(data);
+    res.status(201).send({ msg: savedData });
   } catch (err) {
     return res.status(500).send({ status: false, err: err.message });
   }
@@ -9,6 +55,13 @@ const createBlog = async function (req, res) {
 
 const getBlogs = async function (req, res) {
   try {
+    let data = req.query;
+    let getBlogs = await blogModel
+      .find({ isPublished: true, isDeleted: false, ...data })
+      .populate("authorId");
+    res.status(201).send({ msg: getBlogs });
+    if (getBlogs.length == 0)
+      return res.status(404).send({ msg: "no such blog exist" });
   } catch (error) {
     res.status(500).send({ status: false, err: error.message });
   }
