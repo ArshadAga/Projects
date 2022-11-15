@@ -35,7 +35,7 @@ const createAuthor = async function (req, res) {
           .send({ status: false, msg: "title can be Mr. Miss or Mrs " });
       }
     }
-    if (!validator.isValidEmail(email)) {
+    if (!email) {
       return res.status(400).send({ status: false, msg: "Email is required" });
     }
 
@@ -64,7 +64,7 @@ const createAuthor = async function (req, res) {
       data: newAuthor,
     });
   } catch (err) {
-    res.status(500).send({ status: false, msg: err.message });
+    return res.status(500).send({ status: false, msg: err.message });
   }
 };
 

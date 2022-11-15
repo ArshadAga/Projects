@@ -12,12 +12,14 @@ router.post("/authors", authorController.createAuthor)
 
 router.post("/login",authorController.logInUser)
 
-router.post("/blogs",authentication,authorization, blogController.createBlog)
+router.post("/blogs",authentication, blogController.createBlog)
 
 router.get("/blogs", blogController.getBlogs)
 
 router.put("/blogs/:blogId", blogController.putBlog)
 
 router.delete("/blogs/:blogId",blogController.deleteBlog )
+
+router.delete("/blogs/:queryParams",blogController.blogByQuery )
 
 module.exports = router;

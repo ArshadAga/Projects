@@ -65,7 +65,6 @@ const getBlogs = async function (req, res) {
 const putBlog = async function (req, res) {
   try {
     let data = req.body;
-    let authorId = req.query.authorId;
     let id = req.params.blogId;
 
     if (!id) {
@@ -82,12 +81,10 @@ const putBlog = async function (req, res) {
     }
 
     if (!data.subcategory) {
-      return res
-        .status(400)
-        .send({
-          status: false,
-          msg: "subcategory is required in the request body",
-        });
+      return res.status(400).send({
+        status: false,
+        msg: "subcategory is required in the request body",
+      });
     }
 
     let blogFound = await blogModel.findOne({ _id: id });
@@ -99,16 +96,13 @@ const putBlog = async function (req, res) {
     }
 
     let updatedBlog = await blogModel.findOneAndUpdate(
-      { _id: id, authorId: authorId },
+      { _id: id },
       {
         $set: { data },
       },
       { new: true, upsert: true }
     );
-
-    if (updatedBlog) {
-      return res.status(200).send({ status: true, data: updatedBlog });
-    }
+    return res.status(200).send({ status: true, data: updatedBlog });
   } catch (error) {
     res.status(500).send(error.message);
   }
@@ -156,4 +150,80 @@ const deleteBlog = async function (req, res) {
   }
 };
 
-module.exports = { createBlog, getBlogs, putBlog, deleteBlog };
+const blogByQuery = async (req, res) => {
+  try {
+    const data = req.query;
+
+    if (Object.keys(data) == 0) {
+      return res
+        .status(400)
+        .send({ status: false, message: "No input provided" });
+    }
+
+    const { authorId, category, subcategory, tags } = data;
+    if (!authorId) {
+      return res
+        .status(404)
+        .send({ status: false, message: "Author Id is Mandatory" });
+    }
+
+    if (category) {
+      let verifyCategory = await blogModel.findOne({ category: category });
+      if (!verifyCategory) {
+        return res
+          .status(400)
+          .send({ status: false, msg: "No blogs in this category exist" });
+      }
+    }
+
+    if (tags) {
+      let verifytags = await blogModel.findOne({ tags: tags });
+      if (!verifytags) {
+        return res
+          .status(400)
+          .send({ status: false, msg: "no blog with this tags exist" });
+      }
+    }
+
+    if (subcategory) {
+      let verifysubcategory = await blogModel.findOne({
+        subcategory: subcategory,
+      });
+      if (!verifysubcategory) {
+        return res
+          .status(400)
+          .send({ status: false, msg: "no blog with this subcategory exist" });
+      }
+    }
+
+    let findBlog = await blogModel.find({
+      $and: [data, { isdeleted: false }, { authorId: authorId }],
+    });
+
+    if (!findBlog) {
+      return res
+        .status(400)
+        .send({ status: false, msg: "no blogs are present with this query" });
+    }
+
+    const deleteByQuery = await blogModel.updateMany(
+      data,
+      { isdeleted: true, deletedAt: new Date() },
+      { new: true }
+    );
+
+    if (deleteByQuery) {
+      res
+        .status(200)
+        .send({
+          status: true,
+          msg: "Your blogs have been deleted",
+          data: deleteByQuery,
+        });
+    }
+  } catch (error) {
+    res.status(500).send({ status: false, message: error.message });
+  }
+};
+
+module.exports = { createBlog, getBlogs, putBlog, deleteBlog, blogByQuery };

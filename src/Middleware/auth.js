@@ -1,9 +1,9 @@
 const jwt = require("jsonwebtoken");
+const validator = require("../Validator/Validation");
 
 const authorization = function (req, res, next) {
   try {
-   let token = req.headers["x-api-key"];
-
+    let token = req.headers["x-api-key"];
     if (!token) {
       return res
         .status(400)
@@ -17,12 +17,17 @@ const authorization = function (req, res, next) {
         .send({ status: false, msg: "this is an invalid token" });
     }
 
-    let authorId = req.params.authorId;
+    let authorId = req.body.authorId || req.params.authorId || req.query.authorId;
 
     if (!authorId) {
       return res
         .status(400)
         .send({ status: false, msg: "AuthorId is required to do this action" });
+    }
+    if (!validator.isValidObjectId(authorId)) {
+      return res
+        .status(400)
+        .send({ status: false, msg: "this is not a valid author Id" });
     }
     req.loggedIn = decodeToken.authorId;
     next();
