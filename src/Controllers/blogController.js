@@ -1,5 +1,6 @@
 const blogModel = require("../Models/blogModel");
 const authorModel = require("../Models/authorModel");
+const validator=require("../Validator/Validation")
 
 const createBlog = async function (req, res) {
   try {
@@ -13,27 +14,27 @@ const createBlog = async function (req, res) {
 
     const { title, body, authorId, category } = data;
 
-    if (!isValid(title)) {
+    if (!validator.isValid(title)) {
       return res.status(400).send({ status: false, msg: "title is required" });
     }
 
-    if (!isValid(body)) {
+    if (!validator.isValid(body)) {
       return res.status(400).send({ status: false, msg: "body is required" });
     }
 
-    if (!isValid(authorId)) {
+    if (!validator.isValid(authorId)) {
       return res
         .status(400)
         .send({ status: false, msg: "authorId is required" });
     }
 
-    if (!isValidObjectId(authorId)) {
+    if (!validator.isValidObjectId(authorId)) {
       return res
         .status(400)
         .send({ status: false, msg: `${authorId} is not a valid authorId` });
     }
 
-    if (!isValid(category)) {
+    if (!validator.isValid(category)) {
       return res
         .status(400)
         .send({ status: false, msg: "category title is required" });

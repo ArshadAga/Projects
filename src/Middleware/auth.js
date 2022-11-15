@@ -2,8 +2,7 @@ const jwt = require("jsonwebtoken");
 
 const authorization = function (req, res, next) {
   try {
-   // let token = req.headers["x-auth-token"];
-   let token=req.token;
+   let token = req.headers["x-api-key"];
 
     if (!token) {
       return res
@@ -11,7 +10,7 @@ const authorization = function (req, res, next) {
         .send({ status: false, msg: "neccessary header token is missing" });
     }
 
-    let decodeToken = jwt.verify(token, secretKey);
+    let decodeToken = jwt.verify(token, "this-is-my-Group7");
     if (!decodeToken) {
       return res
         .status(400)
