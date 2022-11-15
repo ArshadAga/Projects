@@ -87,6 +87,12 @@ const putBlog = async function (req, res) {
       });
     }
 
+    if (id.isDeleted === true) {
+      return res
+        .status(400)
+        .send({ status: false, msg: "Blog already Deleted" });
+    }
+
     let blogFound = await blogModel.findOne({ _id: id });
 
     if (!blogFound) {
@@ -98,7 +104,8 @@ const putBlog = async function (req, res) {
     let updatedBlog = await blogModel.findOneAndUpdate(
       { _id: id },
       {
-        $set: { data },
+        $push: { tags: data.tags, subcategory: data.subcategory },
+        $set: { title: data.title, body: data.body, category: data.category },
       },
       { new: true, upsert: true }
     );
@@ -213,13 +220,11 @@ const blogByQuery = async (req, res) => {
     );
 
     if (deleteByQuery) {
-      res
-        .status(200)
-        .send({
-          status: true,
-          msg: "Your blogs have been deleted",
-          data: deleteByQuery,
-        });
+      res.status(200).send({
+        status: true,
+        msg: "Your blogs have been deleted",
+        data: deleteByQuery,
+      });
     }
   } catch (error) {
     res.status(500).send({ status: false, message: error.message });
