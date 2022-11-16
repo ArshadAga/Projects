@@ -13,7 +13,7 @@ const createAuthor = async function (req, res) {
     if (Object.keys(data).length == 0) {
       return res
         .status(400)
-        .send({ status: false, message: "All Keys are Mandatory" });
+        .send({ status: false, message: "All Field are Mandatory" });
     }
 
     const { fname, lname, title, email, password } = data;
@@ -49,19 +49,19 @@ const createAuthor = async function (req, res) {
     if (isEmailAlreadyUsed) {
       return res
         .status(400)
-        .send({ status: false, msg: "email already registered" });
+        .send({ status: false, msg: "Oooh...Email already Registered. Please Login..." });
     }
 
     if (!validator.isValidPassword(password)) {
       return res
         .status(400)
-        .send({ status: false, msg: "Password is required" });
+        .send({ status: false, msg: "Password is required and Should Contain Min 8 character and 1 Special Symbol" });
     }
     const newAuthor = await authorModel.create(data);
 
     res.status(201).send({
       status: true,
-      msg: "author created successfully",
+      msg: "Author Created successfully....",
       data: newAuthor,
     });
   } catch (err) {

@@ -11,7 +11,7 @@ const authentication = function (req, res, next) {
     if (!token) {
       return res
         .status(400)
-        .send({ status: false, msg: "neccessary header token is missing" });
+        .send({ status: false, msg: "Oooh... Please Provide a Token" });
     }
 
     let decodeToken = jwt.verify(token, "this-is-my-Group7");
@@ -21,7 +21,7 @@ const authentication = function (req, res, next) {
         .send({ status: false, msg: "this is an invalid token" });
     }
 
-    let authorId = req.query.authorId;
+    let authorId = req.query.authorId || req.body.authorId ;
     if (!authorId) {
       return res
         .status(400)
@@ -43,7 +43,7 @@ const authentication = function (req, res, next) {
 
 const authorization = function (req, res, next) {
   try {
-    const authorId = req.query.authorId;
+    const authorId = req.query.authorId || req.body.authorId ;
     if (req.loggedIn != authorId) {
       return res
         .status(400)

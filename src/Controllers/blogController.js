@@ -109,12 +109,16 @@ const getBlogs = async function (req, res) {
 const putBlog = async function (req, res) {
   try {
     let data = req.body;
+    let authorId = req.query.authorId;
     let id = req.params.blogId;
 
     if (Object.keys(data).length == 0) {
       return res
         .status(400)
-        .send({ status: false, message: "Please Enter the Valid Key and Value to Update" });
+        .send({
+          status: false,
+          message: "Please Enter the Valid Key and Value to Update",
+        });
     }
 
     if (!validator.isValidObjectId(id)) {
@@ -139,6 +143,15 @@ const putBlog = async function (req, res) {
         .send({ status: false, msg: "No Blog with this Id exist" });
     }
 
+    if (blogFound.authorId != authorId) {
+      return res
+        .status(401)
+        .send({
+          status: false,
+          msg: "You are trying to perform an Unauthorized action",
+        });
+    }
+
     let updatedBlog = await blogModel.findOneAndUpdate(
       { _id: id },
       {
@@ -158,8 +171,8 @@ const putBlog = async function (req, res) {
 const deleteBlog = async function (req, res) {
   try {
     let blog = req.params.blogId;
-
-    if (!blog) {
+    let authorId = req.query.authorId;
+    if (!validator.isValid(blog)) {
       return res.status(400).send({
         status: false,
         msg: "blogId must be present in order to delete it",
@@ -171,8 +184,17 @@ const deleteBlog = async function (req, res) {
     if (!blogFound) {
       return res.status(400).send({
         status: false,
-        msg: "No blog exists bearing this Blog Id, please provide another one",
+        msg: "No blog exists with this Blog Id, please provide another one",
       });
+    }
+
+    if (blogFound.authorId != authorId) {
+      return res
+        .status(401)
+        .send({
+          status: false,
+          msg: "You are trying to perform an Unauthorized action",
+        });
     }
 
     if (blogFound.isdeleted === true) {
