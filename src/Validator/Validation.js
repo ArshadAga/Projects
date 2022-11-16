@@ -5,7 +5,7 @@ const mongoose=require('mongoose')
 //__________________________ Validations : First Name ___________________________________________
 
 const isValidfname=function(fname){
-    const fnameRegex=/^[a-zA-Z]{2,}+$/;
+    const fnameRegex=/^[a-zA-Z]+$/;
     return fnameRegex.test(fname)
 };
 
