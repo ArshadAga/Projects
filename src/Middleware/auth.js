@@ -5,7 +5,7 @@ const validator = require("../Validator/Validation");
 
 //__________________________ Authorization ___________________________________________
 
-const authorization = function (req, res, next) {
+const authentication = function (req, res, next) {
   try {
     let token = req.headers["x-api-key"];
     if (!token) {
@@ -21,8 +21,7 @@ const authorization = function (req, res, next) {
         .send({ status: false, msg: "this is an invalid token" });
     }
 
-    let authorId = req.body.authorId || req.params.authorId || req.query.authorId;
-
+    let authorId = req.query.authorId;
     if (!authorId) {
       return res
         .status(400)
@@ -42,9 +41,9 @@ const authorization = function (req, res, next) {
 
 //__________________________ Authentication ___________________________________________
 
-const authentication = function (req, res, next) {
+const authorization = function (req, res, next) {
   try {
-    const authorId = req.params.authorId;
+    const authorId = req.query.authorId;
     if (req.loggedIn != authorId) {
       return res
         .status(400)

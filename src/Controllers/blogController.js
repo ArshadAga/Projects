@@ -114,7 +114,7 @@ const putBlog = async function (req, res) {
     if (Object.keys(data).length == 0) {
       return res
         .status(400)
-        .send({ status: false, message: "All Keys are Mandatory" });
+        .send({ status: false, message: "Please Enter the Valid Key and Value to Update" });
     }
 
     if (!validator.isValidObjectId(id)) {

@@ -18,13 +18,13 @@ const createAuthor = async function (req, res) {
 
     const { fname, lname, title, email, password } = data;
 
-    if (!validator.isValidfname(fname)) {
+    if (!fname) {
       return res
         .status(400)
         .send({ status: false, msg: "first name is required" });
     }
 
-    if (!validator.isValidLname(lname)) {
+    if (!lname) {
       return res
         .status(400)
         .send({ status: false, msg: "last name is required" });

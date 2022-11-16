@@ -5,7 +5,7 @@ const mongoose=require('mongoose')
 //__________________________ Validations : First Name ___________________________________________
 
 const isValidfname=function(fname){
-    const fnameRegex=/^[a-zA-Z]+$/;
+    const fnameRegex=/^[a-zA-Z]{2,}+$/;
     return fnameRegex.test(fname)
 };
 
@@ -19,7 +19,7 @@ const isValidLname=function(lname){
 //__________________________ Validations : Email  ___________________________________________
 
 const isValidEmail=function(email){
-    const emailRegex=/^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,63})$/;
+    const emailRegex=/^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,})$/;
     return emailRegex.test(email)
 };
 

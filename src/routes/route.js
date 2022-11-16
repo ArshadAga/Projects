@@ -30,7 +30,7 @@ router.get("/blogs", blogController.getBlogs)
 
 //__________________________ put api : Update  ___________________________________________
 
-router.put("/blogs/:authorId",authentication,authorization, blogController.putBlog)
+router.put("/blogs/:blogId",authentication,authorization, blogController.putBlog)
 
 //__________________________ delete api : delete  ___________________________________________
 
@@ -38,7 +38,7 @@ router.delete("/blogs/:blogId",authentication,authorization,blogController.delet
 
 //__________________________ Delete api : Delete by Query ___________________________________________
 
-router.delete("/blogs/",blogController.blogByQuery )
+router.delete("/blogs/",authentication,authorization, blogController.blogByQuery )
 
 //__________________________ Export : Router ___________________________________________
 
