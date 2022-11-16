@@ -57,58 +57,48 @@ const createBlog = async function (req, res) {
 const getBlogs = async function (req, res) {
   try {
     let data = req.query;
-    if (Object.keys(data).length == 0) {
-      return res.status(400).send({
-        status: true,
-        msg: "Provide atleast one key-value to fetch blog details",
-      });
-    }
-    let { category, authorId, tags, subcategory } = data;
-    let filter = { isDeleted: false, isPublished: true };
+    let filter = {
+      isdeleted: false,
+      isPublished: true,
+      ...data,
+    };
+
+    const { category, subcategory, tags } = data;
 
     if (category) {
-      if (!category) {
+      let verifyCategory = await blogModel.findOne({ category: category });
+      if (!verifyCategory) {
         return res
           .status(400)
-          .send({ status: false, msg: "category must be present" });
+          .send({ status: false, msg: "No blogs in this category exist" });
       }
-      filter.category = category;
     }
 
-    if (authorId) {
-      if (!authorId) {
-        return res
-          .status(400)
-          .send({ status: false, msg: "authorId must be present" });
-      }
-      if (!isValidObjectId(authorId)) {
-        return res.status(400).send({ status: false, msg: "Invalid Id" });
-      }
-      filter.authorId = authorId;
-    }
     if (tags) {
-      if (tags.length == 0) {
-        return res.status(400).send({ status: false, msg: "Enter valid tags" });
-      }
-      tags = tags.split(",");
-      filter.tags = { $in: tags };
-    }
-    if (subcategory) {
-      if (subcategory.trim().length == 0) {
+      if (!(await blogModel.exists(tags))) {
         return res
           .status(400)
-          .send({ status: false, msg: "enter valid subcategory" });
+          .send({ status: false, msg: "no blog with this tags exist" });
       }
-      subcategory = subcategory.split(",");
-      filter.subcategory = { $in: category };
     }
-    let fetchBlogs = await blogModel.find(filter);
-    if (fetchBlogs.length == 0) {
+
+    if (subcategory) {
+      if (!(await blogModel.exists(subcategory))) {
+        return res
+          .status(400)
+          .send({ status: false, msg: "no blog with this subcategory exist" });
+      }
+    }
+
+    let getSpecificBlogs = await blogModel.find(filter);
+
+    if (getSpecificBlogs.length == 0) {
       return res
-        .status(404)
-        .send({ status: false, msg: "blog is not available" });
+        .status(400)
+        .send({ status: false, data: "No blogs can be found" });
+    } else {
+      return res.status(200).send({ status: true, data: getSpecificBlogs });
     }
-    return res.status(200).send({ status: true, data: fetchBlogs });
   } catch (error) {
     res.status(500).send({ status: false, err: error.message });
   }
@@ -271,7 +261,6 @@ const blogByQuery = async (req, res) => {
       { isdeleted: true, deletedAt: new Date() },
       { new: true }
     );
-
     if (deleteByQuery) {
       res.status(200).send({
         status: true,
