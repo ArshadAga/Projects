@@ -1,24 +1,36 @@
+//__________________________ Import  ___________________________________________
+
 const mongoose=require('mongoose')
+
+//__________________________ Validations : First Name ___________________________________________
 
 const isValidfname=function(fname){
     const fnameRegex=/^[a-zA-Z]+$/;
     return fnameRegex.test(fname)
 };
 
+//__________________________ Validations : Last Name ___________________________________________
+
 const isValidLname=function(lname){
     const lnameRegex=/^[a-zA-Z]+$/;
     return lnameRegex.test(lname)
 };
+
+//__________________________ Validations : Email  ___________________________________________
 
 const isValidEmail=function(email){
     const emailRegex=/^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,63})$/;
     return emailRegex.test(email)
 };
 
+//__________________________ Validations : Password  ___________________________________________
+
 const isValidPassword=function(password){
     const passwordRegex=/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
     return passwordRegex.test(password)
 };
+
+//__________________________ Validations : Values ___________________________________________
 
 const isValid = function(value){
     if(typeof value === 'undefined' || value === null) return false
@@ -26,9 +38,13 @@ const isValid = function(value){
     return true
   }
 
+  //__________________________ Validations :  ObjectId ___________________________________________
+
   const isValidObjectId = function(objectId){
     return mongoose.Types.ObjectId.isValid(objectId)
   }
+
+  //__________________________ Export : Modules  ___________________________________________
 
   module.exports={
     isValid,

@@ -1,6 +1,10 @@
+//______________________ Import or Require Modules ________________________________
+
 const blogModel = require("../Models/blogModel");
 const authorModel = require("../Models/authorModel");
 const validator = require("../Validator/Validation");
+
+//______________________ post api : Create Blog ________________________________
 
 const createBlog = async function (req, res) {
   try {
@@ -48,48 +52,92 @@ const createBlog = async function (req, res) {
   }
 };
 
+//______________________ get api : get Blog ________________________________
+
 const getBlogs = async function (req, res) {
   try {
     let data = req.query;
-    let getBlogs = await blogModel
-      .find({ isPublished: true, isDeleted: false, ...data })
-      .populate("authorId");
-    res.status(201).send({ msg: getBlogs });
-    if (Object.keys(data).length == 0)
-      return res.status(404).send({ msg: "no such blog exist" });
+    if (Object.keys(data).length == 0) {
+      return res.status(400).send({
+        status: true,
+        msg: "Provide atleast one key-value to fetch blog details",
+      });
+    }
+    let { category, authorId, tags, subcategory } = data;
+    let filter = { isDeleted: false, isPublished: true };
+
+    if (category) {
+      if (!category) {
+        return res
+          .status(400)
+          .send({ status: false, msg: "category must be present" });
+      }
+      filter.category = category;
+    }
+
+    if (authorId) {
+      if (!authorId) {
+        return res
+          .status(400)
+          .send({ status: false, msg: "authorId must be present" });
+      }
+      if (!isValidObjectId(authorId)) {
+        return res.status(400).send({ status: false, msg: "Invalid Id" });
+      }
+      filter.authorId = authorId;
+    }
+    if (tags) {
+      if (tags.length == 0) {
+        return res.status(400).send({ status: false, msg: "Enter valid tags" });
+      }
+      tags = tags.split(",");
+      filter.tags = { $in: tags };
+    }
+    if (subcategory) {
+      if (subcategory.trim().length == 0) {
+        return res
+          .status(400)
+          .send({ status: false, msg: "enter valid subcategory" });
+      }
+      subcategory = subcategory.split(",");
+      filter.subcategory = { $in: category };
+    }
+    let fetchBlogs = await blogModel.find(filter);
+    if (fetchBlogs.length == 0) {
+      return res
+        .status(404)
+        .send({ status: false, msg: "blog is not available" });
+    }
+    return res.status(200).send({ status: true, data: fetchBlogs });
   } catch (error) {
     res.status(500).send({ status: false, err: error.message });
   }
 };
+
+//______________________ PUT api : Update Blog ________________________________
 
 const putBlog = async function (req, res) {
   try {
     let data = req.body;
     let id = req.params.blogId;
 
-    if (!id) {
-      return res.status(400).send({
-        status: false,
-        msg: "blogId must be present in request param ",
-      });
-    }
-
-    if (!data.tags) {
+    if (Object.keys(data).length == 0) {
       return res
         .status(400)
-        .send({ status: false, msg: "tags is required in the request body" });
+        .send({ status: false, message: "All Keys are Mandatory" });
     }
 
-    if (!data.subcategory) {
-      return res.status(400).send({
-        status: false,
-        msg: "subcategory is required in the request body",
-      });
-    }
-
-    if (id.isDeleted === true) {
+    if (!validator.isValidObjectId(id)) {
       return res
         .status(400)
+        .send({ status: false, msg: "this is not a valid blog Id" });
+    }
+
+    const deleteBlod = await blogModel.findById(id);
+
+    if (deleteBlod.isdeleted == true) {
+      return res
+        .status(404)
         .send({ status: false, msg: "Blog already Deleted" });
     }
 
@@ -104,7 +152,7 @@ const putBlog = async function (req, res) {
     let updatedBlog = await blogModel.findOneAndUpdate(
       { _id: id },
       {
-        $push: { tags: data.tags, subcategory: data.subcategory },
+        $addToSet: { tags: data.tags, subcategory: data.subcategory },
         $set: { title: data.title, body: data.body, category: data.category },
       },
       { new: true, upsert: true }
@@ -114,6 +162,8 @@ const putBlog = async function (req, res) {
     res.status(500).send(error.message);
   }
 };
+
+//______________________ Delete api : Delete Blog ________________________________
 
 const deleteBlog = async function (req, res) {
   try {
@@ -144,7 +194,7 @@ const deleteBlog = async function (req, res) {
     let deletedBlog = await blogModel.findOneAndUpdate(
       { _id: blog },
       { $set: { isdeleted: true }, deletedAt: Date.now() },
-      { new: true }
+      { new: true, upsert: true }
     );
 
     return res.status(200).send({
@@ -156,6 +206,8 @@ const deleteBlog = async function (req, res) {
     res.status(500).send({ status: false, msg: err.message });
   }
 };
+
+//______________________ Delete api : Delete Blog by Query ________________________________
 
 const blogByQuery = async (req, res) => {
   try {
@@ -196,6 +248,7 @@ const blogByQuery = async (req, res) => {
       let verifysubcategory = await blogModel.findOne({
         subcategory: subcategory,
       });
+
       if (!verifysubcategory) {
         return res
           .status(400)
@@ -230,5 +283,7 @@ const blogByQuery = async (req, res) => {
     res.status(500).send({ status: false, message: error.message });
   }
 };
+
+//______________________ Export the Modules ________________________________
 
 module.exports = { createBlog, getBlogs, putBlog, deleteBlog, blogByQuery };

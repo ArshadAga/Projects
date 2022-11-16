@@ -1,6 +1,10 @@
+//______________________ Import or Require Modules ________________________________
+
 const authorModel = require("../Models/authorModel");
 const validator = require("../Validator/Validation");
 const jwt=require('jsonwebtoken')
+
+//______________________ post api : Create Author ________________________________
 
 const createAuthor = async function (req, res) {
   try {
@@ -34,9 +38,6 @@ const createAuthor = async function (req, res) {
           .status(400)
           .send({ status: false, msg: "title can be Mr. Miss or Mrs " });
       }
-    }
-    if (!email) {
-      return res.status(400).send({ status: false, msg: "Email is required" });
     }
 
     if (!validator.isValidEmail(email)) {

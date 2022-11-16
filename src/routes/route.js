@@ -1,25 +1,45 @@
+//__________________________ Import or Require Module ___________________________________________
+
 const express=require('express')
 const blogController=require('../Controllers/blogController')
 const authorController=require('../Controllers/authorController')
 const {authentication,authorization}=require('../Middleware/auth')
 const router=express.Router()
 
+//__________________________ get api : for Test ___________________________________________
+
 router.get("/test",(req,res)=>{
     return res.send({status:true,message:"This is My Group7 For Blog Mini Project"});
 })
 
+//__________________________ post api : Create Author ___________________________________________
+
 router.post("/authors", authorController.createAuthor)
+
+//__________________________ post api : Login Author ___________________________________________
 
 router.post("/login",authorController.logInUser)
 
-router.post("/blogs",authentication, blogController.createBlog)
+//__________________________ post api : Create Blog ___________________________________________
+
+router.post("/blogs",authentication,authorization,blogController.createBlog)
+
+//__________________________ get api : Get Blog ___________________________________________
 
 router.get("/blogs", blogController.getBlogs)
 
-router.put("/blogs/:blogId", blogController.putBlog)
+//__________________________ put api : Update  ___________________________________________
 
-router.delete("/blogs/:blogId",blogController.deleteBlog )
+router.put("/blogs/:authorId",authentication,authorization, blogController.putBlog)
 
-router.delete("/blogs/:queryParams",blogController.blogByQuery )
+//__________________________ delete api : delete  ___________________________________________
+
+router.delete("/blogs/:blogId",authentication,authorization,blogController.deleteBlog )
+
+//__________________________ Delete api : Delete by Query ___________________________________________
+
+router.delete("/blogs/",blogController.blogByQuery )
+
+//__________________________ Export : Router ___________________________________________
 
 module.exports = router;

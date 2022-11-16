@@ -1,5 +1,9 @@
+//__________________________ Importing Module ___________________________________________
+
 const jwt = require("jsonwebtoken");
 const validator = require("../Validator/Validation");
+
+//__________________________ Authorization ___________________________________________
 
 const authorization = function (req, res, next) {
   try {
@@ -36,6 +40,8 @@ const authorization = function (req, res, next) {
   }
 };
 
+//__________________________ Authentication ___________________________________________
+
 const authentication = function (req, res, next) {
   try {
     const authorId = req.params.authorId;
@@ -49,4 +55,7 @@ const authentication = function (req, res, next) {
     return res.status(500).send({ status: false, msg: err.message });
   }
 };
+
+//__________________________ Exporting Module ___________________________________________
+
 module.exports = { authentication, authorization };

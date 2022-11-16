@@ -1,4 +1,8 @@
+//______________________ Import or Require Modules ________________________________
+
 const mongoose = require('mongoose')
+
+//____________________________ Creating Schema _____________________________________
 
 const authorSchema = new mongoose.Schema({
    fname :{
@@ -26,5 +30,7 @@ const authorSchema = new mongoose.Schema({
        required : true
    }
 }, {timestamps: true})
+
+//__________________________ Exporting Author Schema ___________________________________________
 
 module.exports = new mongoose.model('Author', authorSchema)
