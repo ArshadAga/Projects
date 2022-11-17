@@ -1,9 +1,8 @@
 //__________________________ Importing Module ___________________________________________
 
 const jwt = require("jsonwebtoken");
-const validator = require("../Validator/Validation");
 
-//__________________________ Authorization ___________________________________________
+//__________________________ authentication ___________________________________________
 
 const authentication = function (req, res, next) {
   try {
@@ -14,37 +13,33 @@ const authentication = function (req, res, next) {
         .send({ status: false, msg: "Oooh... Please Provide a Token" });
     }
 
-    let decodeToken = jwt.verify(token, "this-is-my-Group7");
-    if (!decodeToken) {
-      return res
-        .status(400)
-        .send({ status: false, msg: "this is an invalid token" });
+    try {
+      let decodeToken = jwt.verify(token, "this-is-my-Group7");
+      if (!decodeToken) {
+        return res
+          .status(400)
+          .send({ status: false, msg: "this is an invalid token" });
+      }
+      req.token = decodeToken;
+    } catch (error) {
+      {
+        return res
+          .status(400)
+          .send({ status: false, msg: "this is an invalid token" });
+      }
     }
-
-    let authorId = req.query.authorId || req.body.authorId ;
-    if (!authorId) {
-      return res
-        .status(400)
-        .send({ status: false, msg: "AuthorId is required to do this action" });
-    }
-    if (!validator.isValidObjectId(authorId)) {
-      return res
-        .status(400)
-        .send({ status: false, msg: "this is not a valid author Id" });
-    }
-    req.loggedIn = decodeToken.authorId;
     next();
   } catch (err) {
     return res.status(500).send({ status: false, err: err.message });
   }
 };
 
-//__________________________ Authentication ___________________________________________
+//__________________________ authorization ___________________________________________
 
 const authorization = function (req, res, next) {
   try {
-    const authorId = req.query.authorId || req.body.authorId ;
-    if (req.loggedIn != authorId) {
+    const authorId = req.query.authorId || req.body.authorId;
+    if (req.token.authorId != authorId) {
       return res
         .status(400)
         .send({ status: false, msg: "You are not Valid User" });

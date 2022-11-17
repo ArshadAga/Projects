@@ -2,7 +2,7 @@
 
 const authorModel = require("../Models/authorModel");
 const validator = require("../Validator/Validation");
-const jwt=require('jsonwebtoken')
+const jwt = require("jsonwebtoken");
 
 //______________________ post api : Create Author ________________________________
 
@@ -18,13 +18,13 @@ const createAuthor = async function (req, res) {
 
     const { fname, lname, title, email, password } = data;
 
-    if (!fname) {
+    if (!validator.isValidName(fname)) {
       return res
         .status(400)
         .send({ status: false, msg: "first name is required" });
     }
 
-    if (!lname) {
+    if (!validator.isValidName(lname)) {
       return res
         .status(400)
         .send({ status: false, msg: "last name is required" });
@@ -47,15 +47,17 @@ const createAuthor = async function (req, res) {
     }
     const isEmailAlreadyUsed = await authorModel.findOne({ email });
     if (isEmailAlreadyUsed) {
-      return res
-        .status(400)
-        .send({ status: false, msg: "Oooh...Email already Registered. Please Login..." });
+      return res.status(400).send({
+        status: false,
+        msg: "Oooh...Email already Registered. Please Login...",
+      });
     }
 
     if (!validator.isValidPassword(password)) {
-      return res
-        .status(400)
-        .send({ status: false, msg: "Password is required and Should Contain Min 8 character and 1 Special Symbol" });
+      return res.status(400).send({
+        status: false,
+        msg: "Password is required and Should Contain Min 8 character and 1 Special Symbol",
+      });
     }
     const newAuthor = await authorModel.create(data);
 
@@ -92,7 +94,10 @@ const logInUser = async function (req, res) {
         .status(401)
         .send({ status: false, msg: "Invalid login credentials" });
     }
-    const token = jwt.sign({ authorId: author._id.toString() }, "this-is-my-Group7");
+    const token = jwt.sign(
+      { authorId: author._id.toString() },
+      "this-is-my-Group7"
+    );
     res.setHeader("x-api-key", token);
     return res.status(200).send({ status: true, msg: token });
   } catch (err) {

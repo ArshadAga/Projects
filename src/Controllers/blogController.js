@@ -63,10 +63,17 @@ const getBlogs = async function (req, res) {
       ...data,
     };
 
-    const { category, subcategory, tags } = data;
-
+    const { category, subcategory, tags,authorId } = data;
+    if (authorId) {
+      let verifyAuthorId = await blogModel.find({ authorId: authorId });
+      if (!verifyAuthorId) {
+        return res
+          .status(400)
+          .send({ status: false, msg: "No blogs in this AuthorId exist" });
+      }
+    }
     if (category) {
-      let verifyCategory = await blogModel.findOne({ category: category });
+      let verifyCategory = await blogModel.find({ category: category });
       if (!verifyCategory) {
         return res
           .status(400)
@@ -75,18 +82,20 @@ const getBlogs = async function (req, res) {
     }
 
     if (tags) {
-      if (!(await blogModel.exists(tags))) {
+      let verifyTags = await blogModel.find({ tags: tags });
+      if (!verifyTags) {
         return res
           .status(400)
-          .send({ status: false, msg: "no blog with this tags exist" });
+          .send({ status: false, msg: "No blogs in this tags exist" });
       }
     }
 
     if (subcategory) {
-      if (!(await blogModel.exists(subcategory))) {
+      let verifySubcategory = await blogModel.find({ subcategory: subcategory });
+      if (!verifySubcategory) {
         return res
           .status(400)
-          .send({ status: false, msg: "no blog with this subcategory exist" });
+          .send({ status: false, msg: "No blogs in this Subcategory exist" });
       }
     }
 
@@ -111,14 +120,16 @@ const putBlog = async function (req, res) {
     let data = req.body;
     let authorId = req.query.authorId;
     let id = req.params.blogId;
-
-    if (Object.keys(data).length == 0) {
+    if (!id) {
       return res
         .status(400)
-        .send({
-          status: false,
-          message: "Please Enter the Valid Key and Value to Update",
-        });
+        .send({ status: false, message: "Blog Id is Mandatory" });
+    }
+    if (Object.keys(data).length == 0) {
+      return res.status(400).send({
+        status: false,
+        message: "Please Enter the Valid Key and Value to Update",
+      });
     }
 
     if (!validator.isValidObjectId(id)) {
@@ -127,9 +138,9 @@ const putBlog = async function (req, res) {
         .send({ status: false, msg: "this is not a valid blog Id" });
     }
 
-    const deleteBlod = await blogModel.findById(id);
+    const deleteBlog = await blogModel.findById(id);
 
-    if (deleteBlod.isdeleted == true) {
+    if (deleteBlog.isdeleted == true) {
       return res
         .status(404)
         .send({ status: false, msg: "Blog already Deleted" });
@@ -144,12 +155,10 @@ const putBlog = async function (req, res) {
     }
 
     if (blogFound.authorId != authorId) {
-      return res
-        .status(401)
-        .send({
-          status: false,
-          msg: "You are trying to perform an Unauthorized action",
-        });
+      return res.status(401).send({
+        status: false,
+        msg: "You are trying to perform an Unauthorized action",
+      });
     }
 
     let updatedBlog = await blogModel.findOneAndUpdate(
@@ -171,8 +180,8 @@ const putBlog = async function (req, res) {
 const deleteBlog = async function (req, res) {
   try {
     let blog = req.params.blogId;
-    let authorId = req.query.authorId;
-    if (!validator.isValid(blog)) {
+     let authorId = req.query.authorId;
+    if (!blog) {
       return res.status(400).send({
         status: false,
         msg: "blogId must be present in order to delete it",
@@ -189,12 +198,10 @@ const deleteBlog = async function (req, res) {
     }
 
     if (blogFound.authorId != authorId) {
-      return res
-        .status(401)
-        .send({
-          status: false,
-          msg: "You are trying to perform an Unauthorized action",
-        });
+      return res.status(401).send({
+        status: false,
+        msg: "You are trying to perform an Unauthorized action",
+      });
     }
 
     if (blogFound.isdeleted === true) {
@@ -232,14 +239,9 @@ const blogByQuery = async (req, res) => {
     }
 
     const { authorId, category, subcategory, tags } = data;
-    if (!authorId) {
-      return res
-        .status(404)
-        .send({ status: false, message: "Author Id is Mandatory" });
-    }
 
     if (category) {
-      let verifyCategory = await blogModel.findOne({ category: category });
+      let verifyCategory = await blogModel.find({ category: category });
       if (!verifyCategory) {
         return res
           .status(400)
@@ -248,7 +250,7 @@ const blogByQuery = async (req, res) => {
     }
 
     if (tags) {
-      let verifytags = await blogModel.findOne({ tags: tags });
+      let verifytags = await blogModel.find({ tags: tags });
       if (!verifytags) {
         return res
           .status(400)
@@ -257,7 +259,7 @@ const blogByQuery = async (req, res) => {
     }
 
     if (subcategory) {
-      let verifysubcategory = await blogModel.findOne({
+      let verifysubcategory = await blogModel.find({
         subcategory: subcategory,
       });
 

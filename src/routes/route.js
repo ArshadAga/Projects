@@ -22,11 +22,11 @@ router.post("/login",authorController.logInUser)
 
 //__________________________ post api : Create Blog ___________________________________________
 
-router.post("/blogs",authentication,authorization,blogController.createBlog)
+router.post("/blogs",authentication,blogController.createBlog)
 
 //__________________________ get api : Get Blog ___________________________________________
 
-router.get("/blogs", blogController.getBlogs)
+router.get("/blogs",authentication, blogController.getBlogs)
 
 //__________________________ put api : Update  ___________________________________________
 

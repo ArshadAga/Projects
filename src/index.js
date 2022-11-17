@@ -2,14 +2,10 @@
 
 const express = require("express");
 const route=require('./routes/route')
-// const bodyParser=require('body-parser')
-const { default: mongoose } = require("mongoose");
+const mongoose = require("mongoose");
 const app = express();
 const port = process.env.port || 3000;
 app.use(express.json());
-
-// app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded({ extended: true }));
 
 //__________________________ Connection : MongoDB Cluster ___________________________________________
 
